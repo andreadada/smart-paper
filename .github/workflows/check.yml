@@ -16,7 +16,7 @@ jobs:
         run: |
           python -m pip install playwright
           python -m playwright install --with-deps chromium
-      - name: Browser: stylus, infinite canvas and straight lines
+      - name: Browser stylus infinite canvas and straight lines
         run: |
           python tests/test_stylus.py
           python tests/test_infinite_canvas.py
