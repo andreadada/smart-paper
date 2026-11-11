@@ -25,6 +25,10 @@ TEST_JS = """() => {
   const pen = map().strokes.length === before+1 &&
     map().strokes.at(-1).pressureSensitive &&
     map().strokes.at(-1).points.at(-1).pressure > .7;
+  const strokeId=map().strokes.at(-1).id;
+  send("pointerdown","pen",84,x+35,y+10,.5,5,32);
+  send("pointerup","pen",84,x+35,y+10,0,0,0);
+  const eraser=!map().strokes.some(s=>s.id===strokeId);
   setTool("pen"); penTouchGuardUntil=0;
   const count = map().strokes.length, oldPan = state.panX;
   send("pointerdown","touch",81,x,y);
@@ -39,9 +43,7 @@ TEST_JS = """() => {
   send("pointerup","touch",82,x,y,0,0,0);
   send("pointerup","touch",83,x+130,y,0,0,0);
   const zoom = state.zoom > oldZoom;
-  setTool("select"); send("pointerdown","pen",84,x+35,y+10,.5,5,32);
-  send("pointerup","pen",84,x+35,y+10,0,0,0);
-  const eraser=map().strokes.length < count;
+
   const button=document.querySelector("#stylusAuto");
   button.click();
   const manual=!state.stylusAuto && button.getAttribute("aria-pressed")==="false";
