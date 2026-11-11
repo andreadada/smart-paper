@@ -26,6 +26,8 @@ with sync_playwright() as playwright:
         page.set_content(markup)
         page.add_script_tag(content=javascript)
         page.wait_for_timeout(270)
+        # Ensure the asynchronous initial auto-fit has run before simulating input.
+        page.wait_for_function("state.zoom !== 1", timeout=6000)
         page.evaluate("""() => {setTool('pen');state.maps=[blankMap()];state.activeMapId=state.maps[0].id;renderAll();centerCanvas()}""")
         xy=page.evaluate("""() => {const r=stage.getBoundingClientRect();return [r.left+r.width*.36,r.top+r.height*.33]}""")
         x,y=xy
