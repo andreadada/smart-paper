@@ -19,6 +19,8 @@ with sync_playwright() as p:
         page.set_content(markup)
         page.add_script_tag(content=script)
         page.wait_for_timeout(250)
+        # Ensure the asynchronous initial auto-fit has run before simulating input.
+        page.wait_for_function("state.zoom !== 1", timeout=6000)
         assert page.locator('.brand').count()==0
         assert page.locator('#mapTitle').count()==1
         assert page.locator('#mapTitle').input_value()=='La cripta perduta'
