@@ -216,6 +216,13 @@ input{user-select:text;-webkit-user-select:text}
 .zoom-bar #zoomFit{display:flex;align-items:center;justify-content:center;border-left:1px solid #e9e6df;border-radius:0 9px 9px 0;margin-left:2px;padding-left:4px;width:35px}
 @media(max-width:740px){.topbar{left:12px;right:12px}.top-main{gap:8px}.breadcrumb{min-width:0;align-self:flex-start;width:min(300px,calc(100% - 68px));padding-left:12px;padding-right:12px}.map-title{max-width:100%;width:100%}.zoom-bar{bottom:84px;right:13px}.zoom-bar #zoomFit{display:flex}}
 @media(max-height:560px){.zoom-bar{bottom:58px}}
+/* Smart straightening: the line stays a translucent guide until pen-up. */
+.straight-angle-hud{position:absolute;z-index:12;pointer-events:none;display:none;align-items:center;gap:9px;padding:9px 12px;background:rgba(38,47,40,.94);color:#fffef7;border:1px solid #ffffff22;border-radius:13px;box-shadow:0 8px 26px #232e2640;backdrop-filter:blur(12px);white-space:nowrap;transform:translate3d(0,0,0)}
+.straight-angle-hud.is-visible{display:flex}
+.straight-angle-hud .angle-cross{width:8px;height:8px;border:1.6px solid #d0e1cc;border-radius:50%;box-shadow:0 0 0 3px #b5d7b026}
+.straight-angle-hud strong{font:750 15px/1 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;min-width:42px}
+.straight-angle-hud span:last-child{font-size:10px;font-weight:650;color:#d3ddce;letter-spacing:.1px}
+.straight-angle-hud.is-snapped .angle-cross{background:#b9dbb0}
 @media(prefers-reduced-motion:reduce){.zoom-bar{transition:none}}
 </style>
 </head>
@@ -247,7 +254,7 @@ input{user-select:text;-webkit-user-select:text}
 <aside class="sidebar sticker-panel" id="stickerPanel" aria-label="Sticker"><div class="panel-floating-head panel-drag-handle" data-panel-drag="stickers" title="Trascina per spostare"><div class="panel-drag-text"><span class="panel-eyebrow">PERSONAGGI E OGGETTI</span><strong>La libreria</strong></div><div class="panel-head-actions"><span class="drag-indicator" aria-hidden="true">⠿</span><button class="panel-pin" id="pinStickers" type="button" aria-label="Ancora il pannello sticker" aria-pressed="false" title="Ancora qui il pannello"></button><button class="panel-close" id="closeStickers" type="button" aria-label="Chiudi sticker">×</button></div></div><div class="sidebar-content"><section id="stickersSection"><div class="library-header"><span class="section-title">LIBRERIA STICKER</span><span id="libGlyph"></span></div><div class="tabs"><button class="tab active" data-category="characters">Personaggi</button><button class="tab" data-category="objects">Oggetti</button></div><div class="sticker-grid" id="stickerGrid"></div><button id="addCustomSticker" class="soft-btn" style="width:100%;margin-top:11px">✧ Carica uno sticker PNG</button><p class="muted-note" id="stickerHelp" style="margin:12px 8px 0">Scegli uno sticker, poi clicca su una casella per posizionarlo.</p></section></div></aside>
 <main class="stage-wrap" id="stageWrap"><svg id="stage" class="stage" data-tool="select" xmlns="http://www.w3.org/2000/svg" tabindex="0" aria-label="Mappa vettoriale interattiva"><g id="scene"></g></svg><div class="stage-overlay stage-top-left"><div class="pill"><span id="gridIcon"></span><span id="gridInfo">Griglia infinita</span></div><div class="pill"><span style="width:6px;height:6px;background:#8ca28b;border-radius:50%"></span><span>Modalità <b id="modeLabel">Selezione</b></span></div><button type="button" class="pill stylus-pill" id="stylusAuto" aria-pressed="true" title="Stylus: attiva/disattiva penna automatica"><span id="stylusIcon">✎</span><span id="stylusModeText">Stylus · auto</span></button></div><div class="stage-top-right"><button class="float-icon" id="fitButton" title="Inquadra l’area iniziale"></button><button class="float-icon" id="focusStage" title="Schermo intero"></button></div><div class="map-hint" id="mapHint"></div><div class="canvas-rail" aria-label="Accesso rapido"><button type="button" id="quickMaps" title="Le mie mappe"><span id="quickMapsIcon"></span></button><button type="button" id="quickStickers" title="Personaggi e oggetti"><span id="quickStickerIcon"></span></button><span class="rail-divider"></span><button type="button" id="quickSheet" title="Imposta griglia e sfondo"><span id="quickSheetIcon"></span></button></div>
 <div class="toolbar" id="toolbar"><button class="tool active" data-tool="select" title="Seleziona e sposta · V"></button><button class="tool" data-tool="pan" title="Sposta il foglio · H"></button><span class="toolbar-divider"></span><button class="tool" data-tool="pen" title="Penna · B"></button><button class="tool" data-tool="marker" title="Evidenziatore · M"></button><button class="tool" data-tool="eraser" title="Gomma per tratto · E"></button><span class="toolbar-divider"></span><div class="draw-options" id="drawOptions"><button class="swatch active" style="background:#383a34" data-color="#383a34" title="Grafite"></button><button class="swatch" style="background:#b9644e" data-color="#b9644e" title="Terracotta"></button><button class="swatch" style="background:#668477" data-color="#668477" title="Salvia"></button><button class="swatch" style="background:#4c6b91" data-color="#4c6b91" title="Blu"></button><button class="swatch" style="background:#cfa44e" data-color="#cfa44e" title="Oro"></button><label class="color-picker" title="Altro colore"><input type="color" id="customColor" value="#383a34" aria-label="Colore personalizzato"></label><input class="brush-size" id="brushSize" type="range" min="2" max="28" value="5" title="Dimensione penna"><span class="brush-caption" id="brushSizeText">5</span></div><span class="toolbar-divider"></span><button class="tool" id="undoBtn" title="Annulla · Ctrl+Z"></button><button class="tool" id="redoBtn" title="Ripristina · Ctrl+Shift+Z"></button></div>
-<div class="stage-bottom-left"><span class="hint-mark">✧</span> <strong>IL FOGLIO È TUO</strong><span>Disegna, esplora, racconta.</span></div><div class="zoom-bar" id="zoomControls" aria-label="Zoom e ripristino visuale"><button id="zoomOut" title="Riduci"></button><div class="zoom-label" id="zoomLabel">100%</div><button id="zoomIn" title="Ingrandisci"></button><button id="zoomFit" title="Ripristina la visuale al centro (100%)" aria-label="Torna al centro"></button></div><div class="toast" id="toast"></div>
+<div class="straight-angle-hud" id="straightAngleHud" aria-label="Angolo della linea"><span class="angle-cross"></span><strong id="straightDegrees">0°</strong><span id="straightSnapText">Linea retta</span></div><div class="stage-bottom-left"><span class="hint-mark">✧</span> <strong>IL FOGLIO È TUO</strong><span>Disegna, esplora, racconta.</span></div><div class="zoom-bar" id="zoomControls" aria-label="Zoom e ripristino visuale"><button id="zoomOut" title="Riduci"></button><div class="zoom-label" id="zoomLabel">100%</div><button id="zoomIn" title="Ingrandisci"></button><button id="zoomFit" title="Ripristina la visuale al centro (100%)" aria-label="Torna al centro"></button></div><div class="toast" id="toast"></div>
 </main><aside class="inspector" id="inspector" aria-label="Impostazioni e dettagli"><div class="panel-floating-head panel-drag-handle" data-panel-drag="sheet" title="Trascina per spostare"><div class="panel-drag-text"><span class="panel-eyebrow">PERSONALIZZA</span><strong>Il tuo foglio</strong></div><div class="panel-head-actions"><span class="drag-indicator" aria-hidden="true">⠿</span><button class="panel-pin" id="pinSheet" type="button" aria-label="Ancora il pannello foglio" aria-pressed="false" title="Ancora qui il pannello"></button><button class="panel-close" id="closeInspector" type="button" aria-label="Chiudi impostazioni">×</button></div></div><div id="inspectorContent"></div></aside></div>
 </div>
 <div class="context-backdrop" id="menuBackdrop"></div><div class="modal-backdrop hidden" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-icon" id="modalIcon"></div><h2 id="modalTitle">Nuova mappa</h2><p id="modalDesc">Un nuovo foglio per la tua prossima avventura.</p><label for="newMapName">Nome della mappa</label><input class="input" id="newMapName" maxlength="75" placeholder="Es. La biblioteca sommersa"><div class="modal-footer"><button class="soft-btn" id="modalCancel">Annulla</button><button class="primary-btn" id="modalCreate">Crea mappa</button></div></div></div>
@@ -291,6 +298,66 @@ function pressureStrokePath(points,width){
  const shape=[...left,...right.reverse()];return `M${shape.map(([x,y])=>`${x.toFixed(2)} ${y.toFixed(2)}`).join('L')}Z`;
 }
 let pointerSession=null,spacePressed=false,saveTimer=null,history=[],future=[],wasDrawing=false,menuFor=null,modalMode='create',toastTimer=null,imageMeasurements={};
+const STRAIGHT_HOLD_MS=480,STRAIGHT_SNAP_DEGREES=6;
+function angleDelta(a,b){return ((a-b+540)%360)-180}
+function projectedStraight(start,raw){
+ const dx=raw.x-start.x,dy=raw.y-start.y,length=Math.hypot(dx,dy);
+ const angle=(Math.atan2(dy,dx)*180/Math.PI+360)%360;
+ const closest=Math.round(angle/45)*45;
+ const snapped=length>2&&Math.abs(angleDelta(angle,closest))<=STRAIGHT_SNAP_DEGREES;
+ const degrees=snapped?(closest%360):angle;
+ const rad=degrees*Math.PI/180;
+ return {end:{x:start.x+(snapped?Math.cos(rad)*length:dx),y:start.y+(snapped?Math.sin(rad)*length:dy),pressure:raw.pressure??.5},degrees,snapped,length};
+}
+function hideStraightHud(){const el=$('#straightAngleHud');el?.classList.remove('is-visible','is-snapped')}
+function moveStraightHud(s){
+ const el=$('#straightAngleHud');if(!el||!s.straight)return;
+ const r=stage.getBoundingClientRect();
+ // A fixed-size tooltip does not grow with SVG zoom.
+ const left=s.lastX-r.left,top=s.lastY-r.top;
+ const w=el.offsetWidth||165,h=el.offsetHeight||40;
+ const x=Math.max(9,Math.min(r.width-w-9,left+18));
+ const y=top>h+25?top-h-17:top+21;
+ el.style.left=Math.max(9,x)+'px';el.style.top=Math.max(8,Math.min(r.height-h-8,y))+'px';
+}
+function drawStraightPreview(s,raw){
+ if(!s||!s.straight)return;
+ s.rawEnd=raw;
+ s.projected=projectedStraight(s.start,raw);
+ const el=$('#straightAngleHud');
+ $('#straightDegrees').textContent=`${Math.round(s.projected.degrees)}°`;
+ $('#straightSnapText').textContent=s.projected.snapped?'Agganciato':'Linea retta';
+ el.classList.toggle('is-snapped',s.projected.snapped);
+ el.classList.add('is-visible');
+ renderScene();
+ moveStraightHud(s);
+}
+function activateStraight(s){
+ if(!s||pointerSession!==s||s.kind!=='draw'||s.straight)return;
+ clearTimeout(s.holdTimer);s.straight=true;
+ // The original freehand stroke is kept in memory until pointer-up;
+ // the preview is rendered independently and never saved.
+ drawStraightPreview(s,s.rawEnd||s.start);
+}
+function scheduleStraightHold(s){
+ if(!s||s.straight)return;
+ clearTimeout(s.holdTimer);
+ s.holdTimer=setTimeout(()=>{if(pointerSession===s)activateStraight(s)},STRAIGHT_HOLD_MS);
+}
+function finishStraight(s,e){
+ clearTimeout(s.holdTimer);
+ if(s.straight&&e.type!=='pointercancel'){
+  const t=map().strokes.find(v=>v.id===s.strokeId);
+  if(t){
+   const raw=(Number.isFinite(e.clientX)&&Number.isFinite(e.clientY))?pointerPoint(e):(s.rawEnd||s.start);
+   const result=projectedStraight(s.start,raw);
+   t.points=result.length>1/state.zoom?[{...s.start},result.end]:[{...s.start}];
+   t.pressureSensitive=false; // SVG round line caps, regardless of stylus pressure mode.
+  }
+ }
+ hideStraightHud();
+}
+
 const stage=$('#stage'),scene=$('#scene');const map=()=>state.maps.find(m=>m.id===state.activeMapId)||state.maps[0];
 const dimensions=()=>({w:map().cols*CELL,h:map().rows*CELL});
 function setupIcons(){const set=(sel,ico)=>{const el=$(sel);if(el)el.innerHTML=svgIcon(ico)};set('#crumbChevron','chevron');set('#newMapSide','plus');set('#iconPlusTop','plus');set('#iconExport','download');set('#iconFocusTop','maximize');set('#exportPngIcon','image');set('#exportJsonIcon','download');set('#quickMapsIcon','grid');set('#quickStickerIcon','sparkle');set('#quickSheetIcon','panel');set('#gridIcon','grid');set('#libGlyph','sparkle');set('#fitButton','fit');set('#focusStage','maximize');set('#zoomOut','minus');set('#zoomIn','plus');set('#zoomFit','center');set('#undoBtn','undo');set('#redoBtn','redo');set('#modalIcon','grid');['#pinMaps','#pinStickers','#pinSheet','#pinExport'].forEach(x=>set(x,'pin'));const T={select:'cursor',pan:'hand',pen:'pen',marker:'marker',eraser:'eraser'};document.querySelectorAll('[data-tool]').forEach(x=>{if(x.classList.contains('tool'))x.innerHTML=svgIcon(T[x.dataset.tool])})}
@@ -307,9 +374,15 @@ function renderScene(){
  const majorGrid=`<rect id="gridMajorFill" fill="url(#gridMajor)" opacity=".55" pointer-events="none"/>`;
  let background='';
  if(b?.dataUrl){const sc=b.scale||1,iw=w*sc,ih=h*sc,x=(w-iw)/2+(b.offsetX||0),y=(h-ih)/2+(b.offsetY||0);background=`<image x="${x}" y="${y}" width="${iw}" height="${ih}" href="${esc(b.dataUrl)}" preserveAspectRatio="xMidYMid ${b.fit==='cover'?'slice':'meet'}" opacity="${b.opacity??.78}" pointer-events="none"/>`}
- const marks=m.strokes.map(s=>s.pressureSensitive?`<path class="wall-stroke" d="${pressureStrokePath(s.points,s.width)}" fill="${esc(s.color)}" fill-opacity="${s.opacity??1}"/>`:`<path class="wall-stroke" d="${pointToPath(s.points)}" fill="none" stroke="${esc(s.color)}" stroke-opacity="${s.opacity??1}" stroke-width="${s.width}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+ const marks=m.strokes.filter(s=>!(pointerSession?.kind==='draw'&&pointerSession.straight&&pointerSession.strokeId===s.id)).map(s=>s.pressureSensitive?`<path class="wall-stroke" d="${pressureStrokePath(s.points,s.width)}" fill="${esc(s.color)}" fill-opacity="${s.opacity??1}"/>`:`<path class="wall-stroke" d="${pointToPath(s.points)}" fill="none" stroke="${esc(s.color)}" stroke-opacity="${s.opacity??1}" stroke-width="${s.width}" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
  const tokens=m.tokens.map(tokenMarkup).join('');
- scene.innerHTML=`${defs}<rect id="infinitePaper" class="world-paper" pointer-events="all"/>${m.showGrid&&!m.gridAbove?minorGrid+majorGrid:''}${background}${m.showGrid&&m.gridAbove?minorGrid+majorGrid:''}${marks}${tokens}`;
+ const active=pointerSession?.kind==='draw'&&pointerSession.straight?pointerSession:null;
+ const draft=active&&m.strokes.find(t=>t.id===active.strokeId);
+ const guide=active?.projected&&draft?(()=>{
+  const a=active.start,b=active.projected.end,raw=active.rawEnd,color=esc(draft.color),width=draft.width;
+  return `<g id="straightPreview" pointer-events="none" aria-hidden="true"><line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${color}" stroke-opacity=".17" stroke-width="${width+7}" stroke-linecap="round"/><line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${color}" stroke-opacity=".58" stroke-width="${width}" stroke-linecap="round"/><circle cx="${a.x}" cy="${a.y}" r="${Math.max(3,3/state.zoom)}" fill="#fcfaf3" stroke="${color}" stroke-opacity=".7" stroke-width="${1.5/state.zoom}"/><circle cx="${b.x}" cy="${b.y}" r="${Math.max(3.5,3.5/state.zoom)}" fill="#fcfaf3" stroke="${color}" stroke-opacity=".75" stroke-width="${1.5/state.zoom}"/>${active.projected.snapped?`<line x1="${b.x}" y1="${b.y}" x2="${raw.x}" y2="${raw.y}" stroke="${color}" stroke-opacity=".27" stroke-dasharray="3 5" stroke-width="${1.4/state.zoom}"/>`:''}</g>`;
+ })():'';
+ scene.innerHTML=`${defs}<rect id="infinitePaper" class="world-paper" pointer-events="all"/>${m.showGrid&&!m.gridAbove?minorGrid+majorGrid:''}${background}${m.showGrid&&m.gridAbove?minorGrid+majorGrid:''}${marks}${tokens}${guide}`;
  syncInfiniteGrid();
  $('#gridInfo').textContent='Griglia infinita';$('#mapTitle').value=m.name;$('#zoomLabel').textContent=Math.round(state.zoom*100)+'%';stage.dataset.tool=state.stamp?'stamp':state.tool;
 }
@@ -352,7 +425,8 @@ function exportPNG(){
  const r=stage.getBoundingClientRect();if(!r.width||!r.height)return;
  const w=r.width/state.zoom,h=r.height/state.zoom,x=state.panX,y=state.panY;
  const scale=Math.min(2,4800/Math.max(r.width,r.height));
- const exported=scene.innerHTML.replace(/<circle class="selection-ring"[^>]*\/>/g,'');
+ const exportedScene=scene.cloneNode(true);exportedScene.querySelector('#straightPreview')?.remove();
+ const exported=exportedScene.innerHTML.replace(/<circle class="selection-ring"[^>]*\/>/g,'');
  const markup=`<svg xmlns="http://www.w3.org/2000/svg" width="${r.width}" height="${r.height}" viewBox="${x} ${y} ${w} ${h}"><style>.world-paper{fill:#fcfaf3;stroke:none}.selection-ring{display:none}</style>${exported}</svg>`;
  const image=new Image(),obj=URL.createObjectURL(new Blob([markup],{type:'image/svg+xml;charset=utf-8'}));
  image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=Math.round(r.width*scale);canvas.height=Math.round(r.height*scale);const ctx=canvas.getContext('2d');ctx.fillStyle='#fcfaf3';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(image,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>{if(blob){download(blob,`${fileSlug(map().name)}-vista.png`);toast('Vista PNG esportata')}else toast('Esportazione non riuscita')},'image/png');URL.revokeObjectURL(obj)};
@@ -401,10 +475,11 @@ function beginPointer(e){
  else if(tool==='pen'||tool==='marker'){
   snapshot();session.kind='draw';session.pressureSensitive=isPen&&state.pressureEnabled&&tool==='pen';
   const s={id:id(),points:[pointerPoint(e)],color:state.color,width:tool==='marker'?state.brushSize*3.5:state.brushSize,opacity:tool==='marker'?.35:1,pressureSensitive:session.pressureSensitive};
-  map().strokes.push(s);session.strokeId=s.id;renderScene();
+  map().strokes.push(s);session.strokeId=s.id;session.rawEnd=s.points[0];session.lastHoldX=e.clientX;session.lastHoldY=e.clientY;renderScene();
  }else if(tool==='eraser'){session.kind='erase';pointerSession=session;eraseAt(pos)}
  else{if(isPen)activePenId=null;return}
  pointerSession=session;
+ if(session.kind==='draw'){if(e.shiftKey)activateStraight(session);else scheduleStraightHold(session)}
  try{stage.setPointerCapture(e.pointerId)}catch(err){}
  e.preventDefault();
 }
@@ -429,13 +504,19 @@ function movePointer(e){
  }else if(s.kind==='draw'){
   const t=map().strokes.find(x=>x.id===s.strokeId);
   if(t){
-   let samples=[];try{samples=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[]}catch(err){}
-   for(const sample of [...samples,e]){
-    const p=pointerPoint(sample),l=t.points.at(-1);
-    if(Math.hypot(p.x-l.x,p.y-l.y)>1.1/state.zoom)t.points.push(p);
-    else if(t.pressureSensitive&&Number.isFinite(p.pressure))l.pressure=p.pressure;
+   const latest=pointerPoint(e);s.rawEnd=latest;
+   if(e.shiftKey&&!s.straight)activateStraight(s);
+   if(s.straight){drawStraightPreview(s,latest)}
+   else{
+    let samples=[];try{samples=typeof e.getCoalescedEvents==='function'?e.getCoalescedEvents():[]}catch(err){}
+    for(const sample of [...samples,e]){
+     const p=pointerPoint(sample),l=t.points.at(-1);
+     if(Math.hypot(p.x-l.x,p.y-l.y)>1.1/state.zoom)t.points.push(p);
+     else if(t.pressureSensitive&&Number.isFinite(p.pressure))l.pressure=p.pressure;
+    }
+    if(Math.hypot(e.clientX-s.lastHoldX,e.clientY-s.lastHoldY)>3){s.lastHoldX=e.clientX;s.lastHoldY=e.clientY;scheduleStraightHold(s)}
+    renderScene();
    }
-   renderScene();
   }
  }else if(s.kind==='erase'){eraseAt(atClient(e.clientX,e.clientY))}
  else if(s.kind==='imageMove'){
@@ -449,7 +530,9 @@ function endPointer(e){
  const s=pointerSession;if(!s)return;
  if(s.kind==='pinch'){if(activeTouches.size<2)pointerSession=null;return}
  if(e.pointerId!==s.pointerId)return;
+ if(s.kind==='draw')finishStraight(s,e);
  pointerSession=null;stage.classList.remove('moving');
+ if(s.kind==='draw')renderScene();
  if(['draw','erase','token','imageMove'].includes(s.kind))saveSoon();
  renderToolbar();
 }
@@ -497,7 +580,7 @@ function onInspectorChange(e){const t=e.target,m=map();if(t.id==='colsInput'||t.
 function bind(){window.addEventListener('resize',()=>{view();clampMovedPanels()});stage.addEventListener('pointerdown',beginPointer);stage.addEventListener('pointermove',movePointer);stage.addEventListener('pointerup',endPointer);stage.addEventListener('pointercancel',endPointer);stage.addEventListener('lostpointercapture',endPointer);stage.addEventListener('wheel',e=>{e.preventDefault();if(e.shiftKey){state.panX+=e.deltaY/state.zoom;view(true);return}zoomAt(state.zoom*Math.exp(-e.deltaY*.0014),e.clientX,e.clientY)},{passive:false});stage.addEventListener('contextmenu',e=>e.preventDefault());
 $('#newMapTop').onclick=$('#newMapSide').onclick=()=>showModal();$('#modalCancel').onclick=closeModal;$('#modalCreate').onclick=confirmModal;$('#newMapName').onkeydown=e=>{if(e.key==='Enter')confirmModal()};$('#modalBackdrop').onclick=e=>{if(e.target.id==='modalBackdrop')closeModal()};$('#mapTitle').onchange=e=>{if(e.target.value.trim()){map().name=e.target.value.trim();renderMaps();saveSoon()}else e.target.value=map().name};$('#mapList').addEventListener('click',e=>{const more=e.target.closest('[data-map-more]');if(more){e.stopPropagation();menuFor=menuFor===more.dataset.mapMore?null:more.dataset.mapMore;renderMaps();return}const action=e.target.closest('[data-map-action]');if(action){const mid=action.dataset.id;if(action.dataset.mapAction==='rename'){selectMap(mid);showModal('rename')}else if(action.dataset.mapAction==='duplicate')duplicateMap(mid);else if(action.dataset.mapAction==='delete')deleteMap(mid);menuFor=null;renderMaps();return}const el=e.target.closest('[data-map-id]');if(el)selectMap(el.dataset.mapId)});$('#stickerGrid').addEventListener('click',e=>{const b=e.target.closest('[data-stamp]');if(!b)return;state.stamp=state.stamp===b.dataset.stamp?null:b.dataset.stamp;state.selectedId=null;renderLibrary();renderToolbar();renderScene();renderInspector();closeDrawers()});document.querySelectorAll('[data-category]').forEach(b=>b.onclick=()=>switchCategory(b.dataset.category));document.querySelectorAll('.toolbar [data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));document.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>{state.color=b.dataset.color;renderToolbar()});$('#customColor').oninput=e=>{state.color=e.target.value;renderToolbar()};$('#brushSize').oninput=e=>{state.brushSize=Number(e.target.value);$('#brushSizeText').textContent=state.brushSize};$('#undoBtn').onclick=undo;$('#redoBtn').onclick=redo;$('#stylusAuto').onclick=toggleStylusAuto;$('#zoomControls').addEventListener('pointerenter',()=>clearTimeout(zoomHudTimeout));$('#zoomControls').addEventListener('pointerleave',hideZoomHudSoon);
 $('#zoomOut').onclick=()=>{const [x,y]=stageCenter();zoomAt(state.zoom/1.2,x,y)};$('#zoomIn').onclick=()=>{const[x,y]=stageCenter();zoomAt(state.zoom*1.2,x,y)};$('#zoomFit').onclick=centerCanvas;$('#fitButton').onclick=fit;$('#focusButton').onclick=$('#focusStage').onclick=toggleFocus;$('#exportButton').onclick=doExport;$('#exportPngBtn').onclick=()=>{closeExportMenu();exportPNG()};$('#exportJsonBtn').onclick=()=>{closeExportMenu();exportProject()};$('#inspectorContent').addEventListener('click',onInspectorClick);$('#inspectorContent').addEventListener('input',onInspectorInput);$('#inspectorContent').addEventListener('change',onInspectorChange);$('#pngInput').onchange=e=>{backgroundUpload(e.target.files?.[0]);e.target.value=''};$('#addCustomSticker').onclick=()=>$('#customStickerInput').click();$('#customStickerInput').onchange=e=>{customStickerUpload(e.target.files?.[0]);e.target.value=''};$('#projectInput').onchange=async e=>{const f=e.target.files?.[0];e.target.value='';if(!f)return;try{const d=JSON.parse(await f.text());if(!validProject(d))throw Error('Formato non valido');if(!confirm('Importare questo backup? Le mappe correnti saranno sostituite.'))return;installCustomStickers(d.customStickers);state.maps=d.maps;state.activeMapId=d.activeMapId&&d.maps.some(x=>x.id===d.activeMapId)?d.activeMapId:d.maps[0].id;state.selectedId=null;state.stamp=null;history=[];future=[];renderAll();fit();saveSoon();toast('Backup importato')}catch(err){toast('File JSON non valido')}};$('#openMaps').onclick=$('#quickMaps').onclick=()=>toggleFloating('maps');$('#showStickers').onclick=$('#quickStickers').onclick=()=>toggleFloating('stickers');$('#openInspector').onclick=$('#quickSheet').onclick=()=>toggleFloating('sheet');$('#closeLibrary').onclick=()=>{closePanel('maps',true);refreshFloatingNav()};$('#closeStickers').onclick=()=>{closePanel('stickers',true);refreshFloatingNav()};$('#closeInspector').onclick=()=>{closePanel('sheet',true);refreshFloatingNav()};$('#closeExport').onclick=()=>closePanel('export',true);stage.addEventListener('pointerdown',()=>{if(Object.values(panelElements).some(p=>p.classList.contains('open')))closeDrawers()},true);document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&state.focus){state.focus=false;document.body.classList.remove('focus');$('#focusButton').innerHTML=svgIcon('maximize')+'<span>Schermo intero</span>';$('#focusStage').innerHTML=svgIcon('maximize');setTimeout(fit,40)}});
-window.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;const editing=['INPUT','TEXTAREA','SELECT'].includes(tag);if(e.key==='Escape'){if($('#exportMenu').classList.contains('open')&&!panelPinned('export')){closeExportMenu();return}if(!$('#modalBackdrop').classList.contains('hidden')){closeModal();return}if(closeDrawers())return;if(state.focus){toggleFocus();return}if(state.stamp||state.tool==='imageMove'){setTool('select');return}state.selectedId=null;renderAll();closeDrawers();return}if(editing)return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo();return}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return}if(e.code==='Space'){spacePressed=true;e.preventDefault();return}if(['Delete','Backspace'].includes(e.key)&&state.selectedId){snapshot();map().tokens=map().tokens.filter(x=>x.id!==state.selectedId);state.selectedId=null;renderAll();saveSoon();return}if(e.key==='0'){centerCanvas();return}const shortcuts={v:'select',h:'pan',b:'pen',m:'marker',e:'eraser'};const t=shortcuts[e.key.toLowerCase()];if(t)setTool(t)});window.addEventListener('keyup',e=>{if(e.code==='Space')spacePressed=false});window.addEventListener('blur',()=>spacePressed=false)}
+window.addEventListener('keydown',e=>{const tag=document.activeElement?.tagName;const editing=['INPUT','TEXTAREA','SELECT'].includes(tag);if(e.key==='Escape'){if($('#exportMenu').classList.contains('open')&&!panelPinned('export')){closeExportMenu();return}if(!$('#modalBackdrop').classList.contains('hidden')){closeModal();return}if(closeDrawers())return;if(state.focus){toggleFocus();return}if(state.stamp||state.tool==='imageMove'){setTool('select');return}state.selectedId=null;renderAll();closeDrawers();return}if(editing)return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();if(e.shiftKey)redo();else undo();return}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo();return}if(e.key==='Shift'&&pointerSession?.kind==='draw'&&!pointerSession.straight){activateStraight(pointerSession);return}if(e.code==='Space'){spacePressed=true;e.preventDefault();return}if(['Delete','Backspace'].includes(e.key)&&state.selectedId){snapshot();map().tokens=map().tokens.filter(x=>x.id!==state.selectedId);state.selectedId=null;renderAll();saveSoon();return}if(e.key==='0'){centerCanvas();return}const shortcuts={v:'select',h:'pan',b:'pen',m:'marker',e:'eraser'};const t=shortcuts[e.key.toLowerCase()];if(t)setTool(t)});window.addEventListener('keyup',e=>{if(e.code==='Space')spacePressed=false});window.addEventListener('blur',()=>{spacePressed=false;hideStraightHud();if(pointerSession?.kind==='draw')clearTimeout(pointerSession.holdTimer)})}
 async function init(){loadStylusPrefs();setupIcons();initializeFloatingPanels();bind();await restore();renderAll();requestAnimationFrame(()=>fit(false))}init();
 </script>
 </body>

@@ -17,6 +17,14 @@ Una lavagna per mappe da gioco di ruolo, disegnata come un foglio di carta davve
 - **Compatibilità con i vecchi salvataggi:** le colonne/righe dei progetti esistenti identificano solo l'area PNG di riferimento, non i limiti del mondo. Le pedine fuori da quell'area vengono conservate. Quando non è presente un PNG, non serve configurare alcuna dimensione.
 - **Esportazione PNG:** essendo il mondo infinito, il PNG esporta l'**inquadratura visibile al momento**, non l'intero mondo. Il backup JSON conserva invece tutti i tratti, oggetti e mappe, anche fuori dallo schermo.
 
+## Linee dritte intelligenti (Shift / tieni premuto)
+
+- **Penna o evidenziatore:** disegna normalmente e, senza sollevare il puntatore, **fermalo per circa mezzo secondo** alla fine del tratto. Il disegno viene raddrizzato dal primo all'ultimo punto. Continua a trascinare per orientare e allungare la linea, poi rilascia per confermare.
+- **Mouse / tastiera:** tieni premuto **Shift** mentre disegni, oppure premi Shift durante un tratto già iniziato. La linea resta in anteprima fino al rilascio del mouse.
+- **Anteprima trasparente:** mostra il percorso rettilineo, i due estremi e l'**angolo aggiornato in tempo reale** (0° verso destra, 90° verso il basso).
+- **Aim assist delicato:** entro **±6°** dai multipli di 45° la direzione si aggancia esattamente a 0°, 45°, 90°, 135° ecc. L'angolo visualizzato e il tratto salvato corrispondono alla posizione agganciata.
+- L'anteprima non viene salvata né inclusa nell'esportazione PNG. La linea finita è un normale tratto SVG, cancellabile e annullabile con un solo Undo. Gli altri gesti (un dito per spostare, pinch con due dita, sticker e stylus con pressione) non cambiano.
+
 ## Stylus, dita e mouse
 
 Il rilevamento della penna usa il **Pointer Events API** (`pointerType === 'pen'`), senza identificare marche o modelli. Quindi, quando il browser le presenta come penne, sono supportate Apple Pencil, Samsung S Pen, Xiaomi Smart Pen e altri dispositivi compatibili.
@@ -59,13 +67,13 @@ pip install playwright
 playwright install chromium
 python tests/test_stylus.py
 python tests/test_infinite_canvas.py
+python tests/test_straight_lines.py
 ```
 
-I test sintetici verificano penna automatica, campioni di pressione, navigazione con un dito, pinch, gomma, disattivazione della modalità automatica e rifiuto del palmo. Controllano anche griglia infinita, disegno e pedine fuori dall’area iniziale, visualizzazione temporanea dello zoom, reset al centro, modifica del nome e assenza di errori JavaScript. Per verificare palm rejection, pressione e pulsanti hardware sul dispositivo reale è necessario provare su ciascuna combinazione dispositivo/browser.
+I test sintetici verificano penna automatica, campioni di pressione, navigazione con un dito, pinch, gomma, disattivazione della modalità automatica e rifiuto del palmo. Controllano anche griglia infinita, disegno e pedine fuori dall’area iniziale, visualizzazione temporanea dello zoom, reset al centro, modifica del nome e assenza di errori JavaScript. La suite per le linee verifica Shift durante o all’inizio del tratto, raddrizzamento dopo una pausa, orientamento dell’anteprima, snap a 45°, conferma e Undo su desktop e mobile. Per verificare palm rejection, pressione e pulsanti hardware sul dispositivo reale è necessario provare su ciascuna combinazione dispositivo/browser.
 
 ## Riferimenti
 
 - [Pointer Events – MDN](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events)
 - [PointerEvent.pointerType – MDN](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/pointerType)
 - [PointerEvent.pressure – MDN](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/pressure)
-
